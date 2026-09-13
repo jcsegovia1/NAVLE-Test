@@ -41,7 +41,7 @@ function renderDashboard(){
     <section class="hero">
       <div>
         <div class="eyebrow">Rigorous NAVLE review</div>
-        <h1>Study deeply. Find the gaps. Repeat.</h1>
+        <h1>damn good luck bro</h1>
         <p class="lede">A clean interface for the full ${meta.total.toLocaleString()}-question bank. Build focused species sessions, run weighted mixed exams, and revisit missed material without loading the whole bank at once.</p>
       </div>
       <aside class="hero-stat">
