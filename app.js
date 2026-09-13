@@ -72,13 +72,13 @@ function globalProgress(progress=loadProgress()){
 function showLoading(){app.innerHTML="";app.appendChild(loadingTemplate.content.cloneNode(true))}
 async function init(){
   showLoading();
-  meta=await fetch("data/index.json?v=5").then(r=>r.json());
+  meta=await fetch("data/index.json?v=6").then(r=>r.json());
   normalizeProgress(loadProgress());
   renderDashboard();
 }
 async function getSection(slug){
   if(cache.has(slug))return cache.get(slug);
-  const data=await fetch(`data/${slug}.json?v=5`).then(r=>r.json());
+  const data=await fetch(`data/${slug}.json?v=6`).then(r=>r.json());
   cache.set(slug,data);return data;
 }
 
