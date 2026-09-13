@@ -1,32 +1,40 @@
-# NAVLE Study Lab — completion-first version
+# NAVLE Study Lab
 
-Static GitHub Pages study app for the 5,350-question NAVLE bank.
+A dependency-free static study app generated from the comprehensive NAVLE question bank.
 
-## New study behavior
+## What is included
 
-- A question is **completed the first time you answer it correctly**.
-- Completed questions are removed from normal future Study, Exam, and Mixed NAVLE sessions.
-- Questions answered incorrectly remain active.
-- At the end of a session, **Retry missed** creates a test using only the missed questions.
-- If you miss questions again, another retry round is offered. This continues until the retry set is fully cleared.
-- Every section card shows **remaining**, **completed**, and a visible completion progress bar.
-- Fully cleared sections show **Complete ✓** and offer optional **Review completed** or **Reset section** actions.
-- Mixed NAVLE sessions preserve the approximate species weighting, using only questions that remain active.
-- Existing progress from the previous version is migrated automatically: any question you had already answered correctly is treated as completed.
+- 5,350 multiple-choice questions
+- Species/section study pools
+- Weighted mixed NAVLE sessions
+- Study mode with immediate feedback
+- Exam mode with grading at the end
+- 20 / 50 / 100 / 200-question sessions
+- No duplicate questions within a session
+- Missed-question review
+- Local progress tracking with `localStorage`
+- Question data split into separate JSON files so the browser does not load all 5,350 questions at once
 
-## Replace files in your existing GitHub repo
+## Local preview
 
-For the upgrade, overwrite these files from this package:
+Because the app loads JSON with `fetch()`, do not just double-click `index.html`.
+From the folder, run one of these:
 
-- `app.js`
-- `styles.css`
-- `index.html`
-- `data/index.json`
+```bash
+python -m http.server 8000
+```
 
-The individual question JSON files are unchanged, but the full package includes them too for convenience.
+Then open `http://localhost:8000`.
 
-Commit/push the changes. `index.html` includes `?v=2` cache-busting on the CSS and JS links, which helps Safari and GitHub Pages load the new version immediately.
+## Structure
 
-## Progress storage
+- `index.html` — app shell
+- `styles.css` — interface styling
+- `app.js` — quiz/session/progress logic
+- `data/index.json` — section metadata
+- `data/*.json` — questions split by section
+- `.nojekyll` — tells GitHub Pages to serve files directly
 
-Progress still uses browser `localStorage` under the existing key `navle-study-lab-v1`, so replacing the files does **not** intentionally wipe your existing saved progress.
+## Notes
+
+Progress is stored only in the browser. Clearing site data or using another device/browser starts fresh.
