@@ -1,5 +1,7 @@
 # NAVLE Study Lab
 
+https://jcsegovia1.github.io/NAVLE-Test/
+
 A dependency-free static study app generated from the comprehensive NAVLE question bank.
 
 ## What is included
