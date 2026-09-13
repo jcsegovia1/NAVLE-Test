@@ -1,5 +1,5 @@
 {
-  "total": 5350,
+  "total": 5343,
   "sections": [
     {
       "section": "Canine (25.6)",
@@ -50,7 +50,7 @@
       "section": "Small Mammal (3.3)",
       "label": "Small Mammal",
       "slug": "small-mammal",
-      "count": 277,
+      "count": 270,
       "weight": 3.3,
       "idMin": 4047,
       "idMax": 4323
