@@ -6,7 +6,7 @@ A dependency-free static study app generated from the comprehensive NAVLE questi
 
 ## What is included
 
-- 5,350 multiple-choice questions
+- 5,343 multiple-choice questions
 - Species/section study pools
 - Weighted mixed NAVLE sessions
 - Study mode with immediate feedback
