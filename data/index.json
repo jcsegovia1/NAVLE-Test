@@ -1,0 +1,96 @@
+{
+  "total": 5350,
+  "sections": [
+    {
+      "section": "Canine (25.6)",
+      "label": "Canine",
+      "slug": "canine",
+      "count": 932,
+      "weight": 25.6
+    },
+    {
+      "section": "Feline (24.3)",
+      "label": "Feline",
+      "slug": "feline",
+      "count": 645,
+      "weight": 24.3
+    },
+    {
+      "section": "Equine (14.7)",
+      "label": "Equine",
+      "slug": "equine",
+      "count": 899,
+      "weight": 14.7
+    },
+    {
+      "section": "Bovine (13.3)",
+      "label": "Bovine",
+      "slug": "bovine",
+      "count": 941,
+      "weight": 13.3
+    },
+    {
+      "section": "Porcine (5)",
+      "label": "Porcine",
+      "slug": "porcine",
+      "count": 357,
+      "weight": 5.0
+    },
+    {
+      "section": "Small Mammal (3.3)",
+      "label": "Small Mammal",
+      "slug": "small-mammal",
+      "count": 277,
+      "weight": 3.3
+    },
+    {
+      "section": "OvineCaprine (3.3)",
+      "label": "OvineCaprine",
+      "slug": "ovinecaprine",
+      "count": 273,
+      "weight": 3.3
+    },
+    {
+      "section": "Bird (2.3)",
+      "label": "Bird",
+      "slug": "bird",
+      "count": 194,
+      "weight": 2.3
+    },
+    {
+      "section": "Poultry (2)",
+      "label": "Poultry",
+      "slug": "poultry",
+      "count": 313,
+      "weight": 2.0
+    },
+    {
+      "section": "CamelidCervid (1.7)",
+      "label": "CamelidCervid",
+      "slug": "camelidcervid",
+      "count": 260,
+      "weight": 1.7
+    },
+    {
+      "section": "Reptile (1.5)",
+      "label": "Reptile",
+      "slug": "reptile",
+      "count": 83,
+      "weight": 1.5
+    },
+    {
+      "section": "Aquatics (1)",
+      "label": "Aquatics",
+      "slug": "aquatics",
+      "count": 175,
+      "weight": 1.0
+    },
+    {
+      "section": "Other",
+      "label": "Other",
+      "slug": "other",
+      "count": 1,
+      "weight": 0.0
+    }
+  ]
+}

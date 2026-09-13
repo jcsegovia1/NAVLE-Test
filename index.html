@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="NAVLE comprehensive multiple-choice study app">
+  <meta name="theme-color" content="#0b1715">
+  <title>NAVLE Study Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,600;6..72,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <button class="brand" id="homeBtn" aria-label="Go to dashboard">
+        <span class="brand-mark">N</span>
+        <span>
+          <strong>NAVLE Study Lab</strong>
+          <small>Comprehensive question bank</small>
+        </span>
+      </button>
+      <div class="topbar-actions">
+        <button class="ghost-btn" id="statsBtn">Progress</button>
+        <button class="ghost-btn" id="resetBtn" title="Reset current session">Reset session</button>
+      </div>
+    </header>
+
+    <main id="app" class="main" aria-live="polite"></main>
+  </div>
+
+  <template id="loadingTemplate">
+    <section class="center-card">
+      <div class="spinner" aria-hidden="true"></div>
+      <p>Loading questions…</p>
+    </section>
+  </template>
+
+  <script src="app.js"></script>
+</body>
+</html>
