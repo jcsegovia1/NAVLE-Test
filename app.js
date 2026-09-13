@@ -90,7 +90,7 @@ function renderDashboard(){
     <section class="hero">
       <div>
         <div class="eyebrow">Rigorous NAVLE review</div>
-        <h1>Study deeply. Find the gaps. Repeat.</h1>
+        <h1>good luck <3</h1>
         <p class="lede">Work through the full ${meta.total.toLocaleString()}-question bank once. Every correct answer clears that question from your active pool; missed questions stay in rotation until you get them right.</p>
       </div>
       <aside class="hero-stat">
