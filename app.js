@@ -72,14 +72,50 @@ function globalProgress(progress=loadProgress()){
 function showLoading(){app.innerHTML="";app.appendChild(loadingTemplate.content.cloneNode(true))}
 async function init(){
   showLoading();
-  meta=await fetch("data/index.json?v=2").then(r=>r.json());
+  meta=await fetch("data/index.json?v=5").then(r=>r.json());
   normalizeProgress(loadProgress());
   renderDashboard();
 }
 async function getSection(slug){
   if(cache.has(slug))return cache.get(slug);
-  const data=await fetch(`data/${slug}.json`).then(r=>r.json());
+  const data=await fetch(`data/${slug}.json?v=5`).then(r=>r.json());
   cache.set(slug,data);return data;
+}
+
+function sourceRowForQuestion(q){
+  const sm=meta.sections.find(s=>s.section===q.section);
+  if(!sm)return null;
+  const data=cache.get(sm.slug);
+  return data?.sourceRows?.[String(q.sourceRow)]||null;
+}
+function targetKeysForQuestion(q){
+  const t=String(q.target||"").toLowerCase();
+  if(t==="reportable/zoonotic")return new Set(["reportable","zoonotic"]);
+  return new Set([t]);
+}
+function studyGuideHtml(q){
+  const row=sourceRowForQuestion(q);
+  if(!row)return `<div class="study-guide-panel"><div class="study-guide-empty">Study-guide row unavailable.</div></div>`;
+  const targetKeys=targetKeysForQuestion(q);
+  const sectionName=q.section.replace(/\s*\([^)]*\)\s*$/,"");
+  return `
+    <section class="study-guide-panel" aria-label="Original study guide row">
+      <div class="study-guide-heading">
+        <div><span class="study-guide-kicker">Study guide</span><strong>${esc(sectionName)} · row ${q.sourceRow}</strong></div>
+        <span class="study-guide-source">Original workbook context</span>
+      </div>
+      <div class="study-guide-grid">
+        ${row.fields.map(field=>{
+          const highlighted=targetKeys.has(field.key);
+          const raw=field.displayValue;
+          const blank=raw===null||raw===undefined||raw==="";
+          return `<div class="study-guide-field ${highlighted?"target-field":""}">
+            <div class="study-guide-label">${esc(field.label||field.key)}${field.inherited?'<span class="continued-tag">continued</span>':""}</div>
+            <div class="study-guide-value ${blank?"blank-value":""}">${blank?"—":esc(raw)}</div>
+          </div>`;
+        }).join("")}
+      </div>
+    </section>`;
 }
 
 function renderDashboard(){
@@ -90,7 +126,7 @@ function renderDashboard(){
     <section class="hero">
       <div>
         <div class="eyebrow">Rigorous NAVLE review</div>
-        <h1>good luck <3</h1>
+        <h1>Study deeply. Find the gaps. Repeat.</h1>
         <p class="lede">Work through the full ${meta.total.toLocaleString()}-question bank once. Every correct answer clears that question from your active pool; missed questions stay in rotation until you get them right.</p>
       </div>
       <aside class="hero-stat">
@@ -183,6 +219,7 @@ function renderQuestion(){
   const s=currentSession,q=s.questions[s.index],chosen=s.answers[s.index];
   const answered=chosen!==null;
   const reveal=s.mode==="study"&&answered;
+  const guideOpen=s.guideOpenFor===q.id;
   const progress=pct(s.index+1,s.questions.length);
   const modeLabel=s.retry?`Retry round ${s.round} · ${s.mode==="study"?"Study mode":"Exam mode"}`:(s.reviewOnly?"Completed review":(s.mode==="study"?"Study mode":"Exam mode"));
   app.innerHTML=`
@@ -198,10 +235,22 @@ function renderQuestion(){
         return `<button class="${cls}" data-i="${i}" ${reveal?"disabled":""}><span class="choice-letter">${"ABCD"[i]}</span><span>${esc(choice)}</span></button>`
       }).join("")}</div>
       ${reveal?`<div class="feedback ${chosen===q.answerIndex?"good":"bad"}"><strong>${chosen===q.answerIndex?"Correct — cleared":"Not yet cleared"}</strong><p>${chosen===q.answerIndex?"This question is now removed from normal future sessions.":`Correct answer: ${"ABCD"[q.answerIndex]}. ${esc(q.answer)} This question will return in the retry round.`}</p></div>`:""}
-      <div class="quiz-actions"><button class="secondary-btn" id="quitBtn">Exit</button><div class="quiz-actions-right">${s.mode==="exam"&&s.index>0?'<button class="secondary-btn" id="prevBtn">Previous</button>':""}<button class="primary-btn" id="nextBtn" ${chosen===null?"disabled":""}>${s.index===s.questions.length-1?(s.mode==="exam"?"Submit":"Finish"):"Next"}</button></div></div>
+      ${guideOpen?studyGuideHtml(q):""}
+      <div class="quiz-actions">
+        <div class="quiz-actions-left">
+          <button class="secondary-btn" id="quitBtn">Exit</button>
+          ${reveal?`<button class="secondary-btn study-guide-btn ${guideOpen?"active":""}" id="guideBtn">${guideOpen?"Hide study guide":"View study guide"}</button>`:""}
+        </div>
+        <div class="quiz-actions-right">
+          ${s.mode==="exam"&&s.index>0?'<button class="secondary-btn" id="prevBtn">Previous</button>':""}
+          <button class="primary-btn" id="nextBtn" ${chosen===null?"disabled":""}>${s.index===s.questions.length-1?(s.mode==="exam"?"Submit":"Finish"):"Next"}</button>
+        </div>
+      </div>
     </article>`;
   document.querySelectorAll(".choice").forEach(btn=>btn.onclick=()=>chooseAnswer(Number(btn.dataset.i)));
   document.getElementById("quitBtn").onclick=()=>renderDashboard();
+  const guideBtn=document.getElementById("guideBtn");
+  if(guideBtn)guideBtn.onclick=()=>{s.guideOpenFor=guideOpen?null:q.id;renderQuestion()};
   const prev=document.getElementById("prevBtn");if(prev)prev.onclick=()=>{s.index--;renderQuestion()};
   document.getElementById("nextBtn").onclick=advance;
 }

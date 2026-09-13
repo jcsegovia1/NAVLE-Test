@@ -1,0 +1,117 @@
+
+/* NAVLE Study Lab v5 — View study guide panel */
+.quiz-actions-left{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.study-guide-btn.active{
+  border-color:#5f9f89;
+  background:rgba(133,211,179,.08);
+}
+.study-guide-panel{
+  margin-top:18px;
+  border:1px solid #315047;
+  border-radius:15px;
+  overflow:hidden;
+  background:rgba(7,18,15,.52);
+}
+.study-guide-heading{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+  gap:14px;
+  padding:15px 17px;
+  border-bottom:1px solid #263f38;
+  background:rgba(133,211,179,.045);
+}
+.study-guide-heading strong{
+  display:block;
+  margin-top:3px;
+  font-size:14px;
+}
+.study-guide-kicker{
+  display:block;
+  color:#85d3b3;
+  text-transform:uppercase;
+  letter-spacing:.11em;
+  font-size:10px;
+  font-weight:700;
+}
+.study-guide-source{
+  color:#829a93;
+  font-size:11px;
+  white-space:nowrap;
+}
+.study-guide-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+}
+.study-guide-field{
+  min-width:0;
+  padding:14px 16px 16px;
+  border-bottom:1px solid rgba(48,73,66,.72);
+}
+.study-guide-field:nth-child(odd){
+  border-right:1px solid rgba(48,73,66,.72);
+}
+.study-guide-field.target-field{
+  background:rgba(133,211,179,.07);
+  box-shadow:inset 3px 0 0 rgba(133,211,179,.68);
+}
+.study-guide-label{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  margin-bottom:7px;
+  color:#85d3b3;
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.075em;
+  text-transform:uppercase;
+}
+.continued-tag{
+  padding:2px 5px;
+  border:1px solid #315047;
+  border-radius:999px;
+  color:#829a93;
+  font-size:8px;
+  letter-spacing:.05em;
+}
+.study-guide-value{
+  color:#dce9e4;
+  font-size:14px;
+  line-height:1.5;
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+}
+.blank-value{
+  color:#647b74;
+}
+.study-guide-empty{
+  padding:16px;
+  color:#9bb0aa;
+}
+@media(max-width:620px){
+  .quiz-actions-left{
+    max-width:68%;
+  }
+  .study-guide-grid{
+    grid-template-columns:1fr;
+  }
+  .study-guide-field:nth-child(odd){
+    border-right:0;
+  }
+  .study-guide-heading{
+    align-items:flex-start;
+    flex-direction:column;
+    gap:5px;
+  }
+  .study-guide-source{
+    white-space:normal;
+  }
+  .study-guide-value{
+    font-size:15px;
+  }
+}
