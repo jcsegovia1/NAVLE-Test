@@ -41,7 +41,7 @@ button:focus-visible,.choice:focus-visible,select:focus-visible{outline:3px soli
 .primary-btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
 .main{width:min(var(--max),calc(100% - 40px));margin:0 auto;padding:52px 0 80px}
 .hero{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(290px,.65fr);gap:34px;align-items:end;margin-bottom:34px}
-.eyebrow{text-transform:uppercase;letter-spacing:.14em;font-size:12px;font-weight:700;color:var(--accent)}
+.eyebrow{text-transform:uppercase;letter-spacing:.14em;margin-bottom: 12px;font-size:12px;font-weight:700;color:var(--accent)}
 h1,h2,h3{font-family:"Newsreader",serif;margin:0}
 h1{font-size:clamp(42px,7vw,78px);line-height:.95;letter-spacing:-.04em;max-width:760px}
 h2{font-size:34px;letter-spacing:-.025em}h3{font-size:23px}
