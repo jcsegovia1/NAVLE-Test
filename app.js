@@ -40,7 +40,6 @@ function renderDashboard(){
   app.innerHTML=`
     <section class="hero">
       <div>
-        <div class="eyebrow">Rigorous NAVLE review</div>
         <h1>damn good luck bro</h1>
         <p class="lede">A clean interface for the full ${meta.total.toLocaleString()}-question bank. Build focused species sessions, run weighted mixed exams, and revisit missed material without loading the whole bank at once.</p>
       </div>
