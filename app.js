@@ -7,6 +7,14 @@ const cache = new Map();
 
 function esc(v=""){return String(v).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
 function pct(n,d){return d ? Math.round((n/d)*100) : 0}
+function pctPrecise(n,d){
+  if(!d)return "0";
+  const value=(n/d)*100;
+  if(value===0)return "0";
+  if(value<1)return value.toFixed(2).replace(/0+$/,"").replace(/\.$/,"");
+  if(value<10)return value.toFixed(1).replace(/\.0$/,"");
+  return Math.round(value).toString();
+}
 function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 function defaultProgress(){return {version:2,questions:{},sessions:0}}
 function sectionForQuestionId(id){
@@ -82,14 +90,14 @@ function renderDashboard(){
     <section class="hero">
       <div>
         <div class="eyebrow">Rigorous NAVLE review</div>
-        <h1>No Amount of Vodka Lowers Exam Anxiety</h1>
+        <h1>Study deeply. Find the gaps. Repeat.</h1>
         <p class="lede">Work through the full ${meta.total.toLocaleString()}-question bank once. Every correct answer clears that question from your active pool; missed questions stay in rotation until you get them right.</p>
       </div>
       <aside class="hero-stat">
         <div class="big">${overall.remaining.toLocaleString()}</div>
         <p>questions remaining · ${overall.completed.toLocaleString()} completed</p>
-        <div class="hero-progress"><span style="width:${pct(overall.completed,meta.total)}%"></span></div>
-        <small>${pct(overall.completed,meta.total)}% of the full bank cleared</small>
+        <div class="hero-progress"><span style="width:${(overall.completed/meta.total)*100}%"></span></div>
+        <small>${pctPrecise(overall.completed,meta.total)}% overall complete · ${overall.completed.toLocaleString()} / ${meta.total.toLocaleString()}</small>
       </aside>
     </section>
     <section class="controls">
@@ -176,7 +184,7 @@ function renderQuestion(){
   const answered=chosen!==null;
   const reveal=s.mode==="study"&&answered;
   const progress=pct(s.index+1,s.questions.length);
-  const modeLabel=s.retry?`Retry round ${s.round}`:(s.reviewOnly?"Completed review":(s.mode==="study"?"Study mode":"Exam mode"));
+  const modeLabel=s.retry?`Retry round ${s.round} · ${s.mode==="study"?"Study mode":"Exam mode"}`:(s.reviewOnly?"Completed review":(s.mode==="study"?"Study mode":"Exam mode"));
   app.innerHTML=`
     <section class="quiz-head">
       <div class="quiz-title"><div class="eyebrow">${esc(modeLabel)}</div><h2>${esc(s.label)}</h2><p>${s.questions.length} questions${s.retry?" · missed questions only":" · correct answers leave the active pool"}</p></div>
@@ -232,7 +240,7 @@ function finishSession(){
 }
 function startRetry(missed,previous){
   const qs=shuffle(missed);
-  currentSession={questions:qs,index:0,answers:Array(qs.length).fill(null),mode:"exam",label:previous.label,poolSlug:previous.poolSlug,round:(previous.round||1)+1,retry:true,reviewOnly:previous.reviewOnly};
+  currentSession={questions:qs,index:0,answers:Array(qs.length).fill(null),mode:previous.mode,label:previous.label,poolSlug:previous.poolSlug,round:(previous.round||1)+1,retry:true,reviewOnly:previous.reviewOnly};
   renderQuestion();
 }
 
@@ -254,7 +262,7 @@ function renderStats(){
   const attempts=vals.reduce((n,x)=>n+(x.attempts||0),0),correct=vals.reduce((n,x)=>n+(x.correct||0),0),misses=vals.reduce((n,x)=>n+(x.misses||0),0);
   app.innerHTML=`<section class="stats-card"><div class="eyebrow">Local browser progress</div><h2>Your progress</h2>
     <div class="stats-grid"><div class="stat-box"><strong>${overall.completed.toLocaleString()}</strong><span>completed</span></div><div class="stat-box"><strong>${overall.remaining.toLocaleString()}</strong><span>remaining</span></div><div class="stat-box"><strong>${pct(correct,attempts)}%</strong><span>answer accuracy</span></div><div class="stat-box"><strong>${p.sessions||0}</strong><span>sessions</span></div></div>
-    <div class="overall-progress"><div><strong>${pct(overall.completed,meta.total)}% complete</strong><span>${overall.completed.toLocaleString()} / ${meta.total.toLocaleString()}</span></div><div class="progress-bar"><span style="width:${pct(overall.completed,meta.total)}%"></span></div></div>
+    <div class="overall-progress"><div><strong>${pctPrecise(overall.completed,meta.total)}% complete</strong><span>${overall.completed.toLocaleString()} / ${meta.total.toLocaleString()} across all sections</span></div><div class="progress-bar"><span style="width:${(overall.completed/meta.total)*100}%"></span></div></div>
     <p class="lede">A question is completed the first time you answer it correctly. Incorrect questions remain active and return in retry rounds until you clear them. Progress is stored in this browser with localStorage.</p>
     <div class="result-actions"><button class="primary-btn" id="backDash">Back to dashboard</button><button class="secondary-btn" id="clearProgress">Clear all progress</button></div></section>`;
   document.getElementById("backDash").onclick=renderDashboard;
