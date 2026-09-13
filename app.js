@@ -234,7 +234,7 @@ function renderQuestion(){
         let cls="choice";if(chosen===i)cls+=" selected";if(reveal&&i===q.answerIndex)cls+=" correct";if(reveal&&chosen===i&&chosen!==q.answerIndex)cls+=" wrong";
         return `<button class="${cls}" data-i="${i}" ${reveal?"disabled":""}><span class="choice-letter">${"ABCD"[i]}</span><span>${esc(choice)}</span></button>`
       }).join("")}</div>
-      ${reveal?`<div class="feedback ${chosen===q.answerIndex?"good":"bad"}"><strong>${chosen===q.answerIndex?"Correct — cleared":"Not yet cleared"}</strong><p>${chosen===q.answerIndex?"This question is now removed from normal future sessions.":`Correct answer: ${"ABCD"[q.answerIndex]}. ${esc(q.answer)} This question will return in the retry round.`}</p></div>`:""}
+      ${reveal?`<div class="feedback ${chosen===q.answerIndex?"good":"bad"}"><strong>${chosen===q.answerIndex?"Correct — cleared":"Incorrect"}</strong><p>${chosen===q.answerIndex?"This question is now removed from normal future sessions.":`Correct answer: ${"ABCD"[q.answerIndex]}. ${esc(q.answer)} This question will return in the retry round.`}</p></div>`:""}
       ${guideOpen?studyGuideHtml(q):""}
       <div class="quiz-actions">
         <div class="quiz-actions-left">
