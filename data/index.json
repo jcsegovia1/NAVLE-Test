@@ -8,7 +8,8 @@
       "count": 932,
       "weight": 25.6,
       "idMin": 1571,
-      "idMax": 2502
+      "idMax": 2502,
+      "clinicalCount": 103
     },
     {
       "section": "Feline (24.3)",
@@ -17,7 +18,8 @@
       "count": 645,
       "weight": 24.3,
       "idMin": 3402,
-      "idMax": 4046
+      "idMax": 4046,
+      "clinicalCount": 86
     },
     {
       "section": "Equine (14.7)",
@@ -26,7 +28,8 @@
       "count": 899,
       "weight": 14.7,
       "idMin": 2503,
-      "idMax": 3401
+      "idMax": 3401,
+      "clinicalCount": 149
     },
     {
       "section": "Bovine (13.3)",
@@ -35,7 +38,8 @@
       "count": 941,
       "weight": 13.3,
       "idMin": 370,
-      "idMax": 1310
+      "idMax": 1310,
+      "clinicalCount": 134
     },
     {
       "section": "Porcine (5)",
@@ -44,7 +48,8 @@
       "count": 357,
       "weight": 5.0,
       "idMin": 4597,
-      "idMax": 4953
+      "idMax": 4953,
+      "clinicalCount": 63
     },
     {
       "section": "Small Mammal (3.3)",
@@ -53,7 +58,8 @@
       "count": 270,
       "weight": 3.3,
       "idMin": 4047,
-      "idMax": 4323
+      "idMax": 4323,
+      "clinicalCount": 52
     },
     {
       "section": "OvineCaprine (3.3)",
@@ -62,7 +68,8 @@
       "count": 273,
       "weight": 3.3,
       "idMin": 4324,
-      "idMax": 4596
+      "idMax": 4596,
+      "clinicalCount": 36
     },
     {
       "section": "Bird (2.3)",
@@ -71,7 +78,8 @@
       "count": 194,
       "weight": 2.3,
       "idMin": 176,
-      "idMax": 369
+      "idMax": 369,
+      "clinicalCount": 23
     },
     {
       "section": "Poultry (2)",
@@ -80,7 +88,8 @@
       "count": 313,
       "weight": 2.0,
       "idMin": 4954,
-      "idMax": 5266
+      "idMax": 5266,
+      "clinicalCount": 60
     },
     {
       "section": "CamelidCervid (1.7)",
@@ -89,7 +98,8 @@
       "count": 260,
       "weight": 1.7,
       "idMin": 1311,
-      "idMax": 1570
+      "idMax": 1570,
+      "clinicalCount": 28
     },
     {
       "section": "Reptile (1.5)",
@@ -98,7 +108,8 @@
       "count": 83,
       "weight": 1.5,
       "idMin": 5267,
-      "idMax": 5349
+      "idMax": 5349,
+      "clinicalCount": 3
     },
     {
       "section": "Aquatics (1)",
@@ -107,7 +118,8 @@
       "count": 175,
       "weight": 1.0,
       "idMin": 1,
-      "idMax": 175
+      "idMax": 175,
+      "clinicalCount": 21
     },
     {
       "section": "Other",
@@ -116,7 +128,9 @@
       "count": 1,
       "weight": 0.0,
       "idMin": 5350,
-      "idMax": 5350
+      "idMax": 5350,
+      "clinicalCount": 0
     }
-  ]
+  ],
+  "clinicalTotal": 758
 }
