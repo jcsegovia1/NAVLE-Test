@@ -101,14 +101,14 @@ function globalProgress(style,progress=loadProgress()){
 function showLoading(){app.innerHTML="";app.appendChild(loadingTemplate.content.cloneNode(true))}
 async function init(){
   showLoading();
-  meta=await fetch("data/index.json?v=17").then(r=>r.json());
+  meta=await fetch("data/index.json?v=18").then(r=>r.json());
   hydrateClinicalMeta();
   normalizeProgress(loadProgress());
   renderDashboard();
 }
 async function getSection(slug){
   if(cache.has(slug))return cache.get(slug);
-  const data=await fetch(`data/${slug}.json?v=17`).then(r=>r.json());
+  const data=await fetch(`data/${slug}.json?v=18`).then(r=>r.json());
   cache.set(slug,data);return data;
 }
 function questionsForData(data,style){return style==="clinical"?(data.clinicalQuestions||[]):data.questions}
