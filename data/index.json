@@ -59,7 +59,7 @@
       "weight": 3.3,
       "idMin": 4047,
       "idMax": 4323,
-      "clinicalCount": 47
+      "clinicalCount": 46
     },
     {
       "section": "OvineCaprine (3.3)",
@@ -132,5 +132,5 @@
       "clinicalCount": 0
     }
   ],
-  "clinicalTotal": 733
+  "clinicalTotal": 732
 }
