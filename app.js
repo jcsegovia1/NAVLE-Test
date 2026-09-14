@@ -5,9 +5,7 @@ let meta = null;
 let currentSession = null;
 const cache = new Map();
 const CLINICAL_COUNTS_FALLBACK = {
-  "canine":103,"feline":86,"equine":149,"bovine":134,"porcine":63,
-  "small-mammal":52,"ovinecaprine":36,"bird":23,"poultry":60,
-  "camelidcervid":28,"reptile":3,"aquatics":21,"other":0
+  "canine":102, "feline":85, "equine":144, "bovine":123, "porcine":63, "small-mammal":47, "ovinecaprine":35, "bird":23, "poultry":60, "camelidcervid":28, "reptile":3, "aquatics":20, "other":0
 };
 function hydrateClinicalMeta(){
   if(!meta?.sections)return;
@@ -103,14 +101,14 @@ function globalProgress(style,progress=loadProgress()){
 function showLoading(){app.innerHTML="";app.appendChild(loadingTemplate.content.cloneNode(true))}
 async function init(){
   showLoading();
-  meta=await fetch("data/index.json?v=15").then(r=>r.json());
+  meta=await fetch("data/index.json?v=16").then(r=>r.json());
   hydrateClinicalMeta();
   normalizeProgress(loadProgress());
   renderDashboard();
 }
 async function getSection(slug){
   if(cache.has(slug))return cache.get(slug);
-  const data=await fetch(`data/${slug}.json?v=15`).then(r=>r.json());
+  const data=await fetch(`data/${slug}.json?v=16`).then(r=>r.json());
   cache.set(slug,data);return data;
 }
 function questionsForData(data,style){return style==="clinical"?(data.clinicalQuestions||[]):data.questions}
