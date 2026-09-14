@@ -16,22 +16,34 @@ function pctPrecise(n,d){
   return Math.round(value).toString();
 }
 function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
-function defaultProgress(){return {version:2,questions:{},sessions:0}}
+function styleLabel(style){return style==="clinical"?"Clinical Cases":"Quick Burst"}
+function trackKey(style){return style==="clinical"?"clinicalQuestions":"questions"}
+function totalForStyle(style){return style==="clinical"?(meta.clinicalTotal||0):meta.total}
+function countForSection(s,style){return style==="clinical"?(s.clinicalCount||0):s.count}
+
+function defaultProgress(){return {version:3,questions:{},clinicalQuestions:{},sessions:0}}
 function sectionForQuestionId(id){
   const n=Number(String(id).replace(/\D/g,""));
   return meta?.sections.find(s=>n>=s.idMin&&n<=s.idMax)?.section || null;
 }
-function normalizeProgress(p){
-  if(!p||typeof p!=="object")p=defaultProgress();
-  p.questions ||= {}; p.sessions ||= 0; p.version=2;
+function normalizeTrack(track,isClinical=false){
+  track ||= {};
   let changed=false;
-  for(const [id,s] of Object.entries(p.questions)){
-    if(typeof s!=="object"||!s){p.questions[id]={attempts:0,correct:0,misses:0,completed:false};changed=true;continue}
+  for(const [id,s0] of Object.entries(track)){
+    let s=s0;
+    if(typeof s!=="object"||!s){track[id]={attempts:0,correct:0,misses:0,completed:false};changed=true;continue}
     if(s.completed===undefined){s.completed=(s.correct||0)>0;changed=true}
     if(s.misses===undefined){s.misses=Math.max(0,(s.attempts||0)-(s.correct||0));changed=true}
-    if(!s.section&&meta){s.section=sectionForQuestionId(id);changed=true}
+    if(!s.section&&meta&&!isClinical){s.section=sectionForQuestionId(id);changed=true}
   }
-  if(changed)saveProgress(p);
+  return {track,changed};
+}
+function normalizeProgress(p){
+  if(!p||typeof p!=="object")p=defaultProgress();
+  p.questions ||= {}; p.clinicalQuestions ||= {}; p.sessions ||= 0;
+  const a=normalizeTrack(p.questions,false), b=normalizeTrack(p.clinicalQuestions,true);
+  p.questions=a.track; p.clinicalQuestions=b.track; p.version=3;
+  if(a.changed||b.changed)saveProgress(p);
   return p;
 }
 function loadProgress(){
@@ -39,48 +51,50 @@ function loadProgress(){
   catch{return defaultProgress()}
 }
 function saveProgress(p){localStorage.setItem(APP_KEY,JSON.stringify(p))}
-function isCompleted(id,progress=loadProgress()){return !!progress.questions[id]?.completed}
-function recordAttempt(q,correct,{preserveCompletion=false}={}){
-  const p=loadProgress();
-  const s=p.questions[q.id] || {attempts:0,correct:0,misses:0,completed:false,section:q.section};
+function isCompleted(id,style,progress=loadProgress()){return !!progress[trackKey(style)]?.[id]?.completed}
+function recordAttempt(q,correct,{style="quick",preserveCompletion=false}={}){
+  const p=loadProgress(), key=trackKey(style), track=p[key]||(p[key]={});
+  const s=track[q.id] || {attempts:0,correct:0,misses:0,completed:false,section:q.section};
   s.attempts=(s.attempts||0)+1;
   s.correct=(s.correct||0)+(correct?1:0);
   s.misses=(s.misses||0)+(correct?0:1);
-  s.last=correct;
-  s.section=q.section;
+  s.last=correct; s.section=q.section; s.lastSeen=Date.now();
   if(correct)s.completed=true;
-  else if(!preserveCompletion && !s.completed)s.completed=false;
-  s.lastSeen=Date.now();
-  p.questions[q.id]=s;
-  saveProgress(p);
+  else if(!preserveCompletion&&!s.completed)s.completed=false;
+  track[q.id]=s; saveProgress(p);
 }
-function sectionProgress(section,progress=loadProgress()){
+function sectionProgress(section,style,progress=loadProgress()){
+  const key=trackKey(style), track=progress[key]||{};
   let completed=0,attempted=0;
-  for(const [id,s] of Object.entries(progress.questions)){
-    const sec=s.section||sectionForQuestionId(id);
+  for(const [id,s] of Object.entries(track)){
+    const sec=s.section||(!style||style==="quick"?sectionForQuestionId(id):null);
     if(sec!==section.section)continue;
     if((s.attempts||0)>0)attempted++;
     if(s.completed)completed++;
   }
-  completed=Math.min(completed,section.count);
-  return {completed,remaining:Math.max(0,section.count-completed),attempted};
+  const count=countForSection(section,style);
+  completed=Math.min(completed,count);
+  return {completed,remaining:Math.max(0,count-completed),attempted,count};
 }
-function globalProgress(progress=loadProgress()){
-  const completed=meta.sections.reduce((n,s)=>n+sectionProgress(s,progress).completed,0);
-  return {completed,remaining:Math.max(0,meta.total-completed)};
+function globalProgress(style,progress=loadProgress()){
+  const completed=meta.sections.reduce((n,s)=>n+sectionProgress(s,style,progress).completed,0);
+  const total=totalForStyle(style);
+  return {completed,remaining:Math.max(0,total-completed),total};
 }
+
 function showLoading(){app.innerHTML="";app.appendChild(loadingTemplate.content.cloneNode(true))}
 async function init(){
   showLoading();
-  meta=await fetch("data/index.json?v=10").then(r=>r.json());
+  meta=await fetch("data/index.json?v=12").then(r=>r.json());
   normalizeProgress(loadProgress());
   renderDashboard();
 }
 async function getSection(slug){
   if(cache.has(slug))return cache.get(slug);
-  const data=await fetch(`data/${slug}.json?v=10`).then(r=>r.json());
+  const data=await fetch(`data/${slug}.json?v=12`).then(r=>r.json());
   cache.set(slug,data);return data;
 }
+function questionsForData(data,style){return style==="clinical"?(data.clinicalQuestions||[]):data.questions}
 
 function sourceRowForQuestion(q){
   const sm=meta.sections.find(s=>s.section===q.section);
@@ -91,6 +105,9 @@ function sourceRowForQuestion(q){
 function targetKeysForQuestion(q){
   const t=String(q.target||"").toLowerCase();
   if(t==="reportable/zoonotic")return new Set(["reportable","zoonotic"]);
+  if(t==="diagnosis")return new Set(["disease"]);
+  if(t==="treatment")return new Set(["treatment"]);
+  if(t==="diagnostics")return new Set(["diagnostics"]);
   return new Set([t]);
 }
 function studyGuideHtml(q){
@@ -118,66 +135,75 @@ function studyGuideHtml(q){
     </section>`;
 }
 
+function progressLane(title,progress,kind){
+  const p=pctPrecise(progress.completed,progress.total);
+  return `<div class="hero-lane ${kind}">
+    <div class="hero-lane-head"><strong>${title}</strong><span>${progress.remaining.toLocaleString()} remaining</span></div>
+    <div class="hero-progress"><span style="width:${progress.total?(progress.completed/progress.total)*100:0}%"></span></div>
+    <small>${p}% complete · ${progress.completed.toLocaleString()} / ${progress.total.toLocaleString()}</small>
+  </div>`;
+}
+
 function renderDashboard(){
   currentSession=null;
   const progress=loadProgress();
-  const overall=globalProgress(progress);
+  const quick=globalProgress("quick",progress), clinical=globalProgress("clinical",progress);
   app.innerHTML=`
     <section class="hero">
       <div>
         <div class="eyebrow">Rigorous NAVLE review</div>
-        <h1>Study deeply. Find the gaps. Repeat.</h1>
-        <p class="lede">Work through the full ${meta.total.toLocaleString()}-question bank once. Every correct answer clears that question from your active pool; missed questions stay in rotation until you get them right.</p>
+        <h1>good luck &lt;3</h1>
+        <p class="lede">Use Quick Burst to build factual recall, then Clinical Cases to apply those facts to patient-style vignettes. The two tracks have separate completion progress so one never clears the other.</p>
       </div>
-      <aside class="hero-stat">
-        <div class="big">${overall.remaining.toLocaleString()}</div>
-        <p>questions remaining · ${overall.completed.toLocaleString()} completed</p>
-        <div class="hero-progress"><span style="width:${(overall.completed/meta.total)*100}%"></span></div>
-        <small>${pctPrecise(overall.completed,meta.total)}% overall complete · ${overall.completed.toLocaleString()} / ${meta.total.toLocaleString()}</small>
+      <aside class="hero-stat dual-progress">
+        ${progressLane("Quick Burst",quick,"quick")}
+        ${progressLane("Clinical Cases",clinical,"clinical")}
       </aside>
     </section>
-    <section class="controls">
-      <div class="field"><label>Question pool</label>
-        <select id="poolSelect"><option value="mixed">Mixed NAVLE (weighted)</option>${meta.sections.map(s=>{const sp=sectionProgress(s,progress);return `<option value="${s.slug}" ${sp.remaining===0?"disabled":""}>${esc(s.label)} · ${sp.remaining} remaining</option>`}).join("")}</select>
+
+    <section class="controls clinical-controls">
+      <div class="field"><label>Question style</label>
+        <select id="styleSelect"><option value="quick">Quick Burst</option><option value="clinical">Clinical Cases</option></select>
       </div>
-      <div class="field"><label>Mode</label><select id="modeSelect"><option value="study">Study · instant feedback</option><option value="exam">Exam · grade at end</option></select></div>
+      <div class="field"><label>Question pool</label>
+        <select id="poolSelect"><option value="mixed">Mixed NAVLE (weighted)</option>${meta.sections.map(s=>`<option value="${s.slug}">${esc(s.label)}</option>`).join("")}</select>
+      </div>
+      <div class="field"><label>Feedback</label><select id="modeSelect"><option value="study">Study · instant feedback</option><option value="exam">Exam · grade at end</option></select></div>
       <div class="field"><label>Questions</label><select id="sizeSelect"><option>20</option><option selected>50</option><option>100</option><option>200</option></select></div>
-      <button class="primary-btn" id="startBtn" ${overall.remaining===0?"disabled":""}>${overall.remaining===0?"Bank complete":"Start session"}</button>
+      <button class="primary-btn" id="startBtn">Start session</button>
     </section>
+
     <div class="section-heading"><div><div class="eyebrow">Question bank</div><h2>Study by section</h2></div><p>${meta.sections.length} sections</p></div>
     <section class="grid">
       ${meta.sections.map(s=>{
-        const sp=sectionProgress(s,progress), done=sp.remaining===0;
-        return `<button class="category-card ${done?"complete-card":""}" data-slug="${s.slug}">
-          <div class="card-top"><span class="count">${s.count.toLocaleString()} questions</span>${done?'<span class="complete-chip">Complete ✓</span>':""}</div>
+        const qp=sectionProgress(s,"quick",progress), cp=sectionProgress(s,"clinical",progress);
+        return `<button class="category-card dual-card" data-slug="${s.slug}">
+          <div class="card-top"><span class="count">${s.count.toLocaleString()} quick · ${(s.clinicalCount||0).toLocaleString()} cases</span></div>
           <h3>${esc(s.label)}</h3>
-          <div class="mini-progress" aria-label="${pct(sp.completed,s.count)}% complete"><span style="width:${pct(sp.completed,s.count)}%"></span></div>
-          <div class="progress-numbers"><strong>${sp.remaining.toLocaleString()} remaining</strong><span>${sp.completed.toLocaleString()} completed</span></div>
-          <div class="card-footer"><span>${done?"Section cleared":`${pct(sp.completed,s.count)}% complete`}</span><span>${done?"Review →":"Open →"}</span></div>
+          <div class="track-block"><div class="track-label"><span>Quick Burst</span><span>${qp.remaining.toLocaleString()} left</span></div><div class="mini-progress"><span style="width:${qp.count?(qp.completed/qp.count)*100:0}%"></span></div></div>
+          <div class="track-block clinical-track"><div class="track-label"><span>Clinical Cases</span><span>${cp.count?`${cp.remaining.toLocaleString()} left`:"No cases"}</span></div><div class="mini-progress"><span style="width:${cp.count?(cp.completed/cp.count)*100:0}%"></span></div></div>
+          <div class="card-footer"><span>${qp.completed.toLocaleString()} quick cleared</span><span>${cp.completed.toLocaleString()} cases cleared</span></div>
         </button>`
       }).join("")}
     </section>`;
-  const start=document.getElementById("startBtn"); if(start)start.onclick=()=>startConfiguredSession();
-  document.querySelectorAll(".category-card").forEach(btn=>btn.onclick=()=>openSection(btn.dataset.slug));
+
+  document.getElementById("startBtn").onclick=()=>startConfiguredSession();
+  document.querySelectorAll(".category-card").forEach(btn=>btn.onclick=()=>{
+    document.getElementById("poolSelect").value=btn.dataset.slug;
+    startConfiguredSession();
+  });
 }
 
-async function activeQuestionsForSection(sectionMeta,progress=loadProgress()){
+async function activeQuestionsForSection(sectionMeta,style,progress=loadProgress()){
   const data=await getSection(sectionMeta.slug);
-  return data.questions.filter(q=>!isCompleted(q.id,progress));
+  return questionsForData(data,style).filter(q=>!isCompleted(q.id,style,progress));
 }
-async function openSection(slug){
-  const s=meta.sections.find(x=>x.slug===slug);
-  const sp=sectionProgress(s);
-  if(sp.remaining===0){renderCompletedSection(s);return}
-  document.getElementById("poolSelect").value=slug;
-  startConfiguredSession();
-}
-async function buildMixed(size){
+async function buildMixed(size,style){
   const progress=loadProgress();
-  const weighted=meta.sections.filter(s=>s.weight>0);
+  const weighted=meta.sections.filter(s=>s.weight>0&&countForSection(s,style)>0);
   const pools=[];
   for(const s of weighted){
-    const active=await activeQuestionsForSection(s,progress);
+    const active=await activeQuestionsForSection(s,style,progress);
     if(active.length)pools.push({...s,active});
   }
   const available=pools.reduce((n,s)=>n+s.active.length,0);
@@ -187,7 +213,7 @@ async function buildMixed(size){
   const plan=pools.map(s=>{const exact=size*s.weight/totalWeight;return {...s,take:Math.min(s.active.length,Math.floor(exact)),frac:exact-Math.floor(exact)}});
   let left=size-plan.reduce((n,s)=>n+s.take,0);
   while(left>0){
-    let candidates=plan.filter(s=>s.take<s.active.length).sort((a,b)=>(b.frac-a.frac)||(b.weight-a.weight));
+    const candidates=plan.filter(s=>s.take<s.active.length).sort((a,b)=>(b.frac-a.frac)||(b.weight-a.weight));
     if(!candidates.length)break;
     for(const s of candidates){if(left<=0)break;s.take++;left--}
   }
@@ -196,45 +222,72 @@ async function buildMixed(size){
   return shuffle(picked).slice(0,size);
 }
 async function startConfiguredSession(){
+  const style=document.getElementById("styleSelect").value;
   const pool=document.getElementById("poolSelect").value;
   const mode=document.getElementById("modeSelect").value;
   const requested=Number(document.getElementById("sizeSelect").value);
   showLoading();
   let qs,label,poolSlug=pool;
-  if(pool==="mixed"){qs=await buildMixed(requested);label="Mixed NAVLE"}
+  if(pool==="mixed"){qs=await buildMixed(requested,style);label=`Mixed NAVLE · ${styleLabel(style)}`}
   else{
     const sm=meta.sections.find(s=>s.slug===pool), data=await getSection(pool);
-    const active=data.questions.filter(q=>!isCompleted(q.id));
-    label=data.label; qs=shuffle(active).slice(0,Math.min(requested,active.length));
+    const active=questionsForData(data,style).filter(q=>!isCompleted(q.id,style));
+    label=`${data.label} · ${styleLabel(style)}`;
+    qs=shuffle(active).slice(0,Math.min(requested,active.length));
   }
-  if(!qs.length){renderNoQuestions(label,poolSlug);return}
-  currentSession={questions:qs,index:0,answers:Array(qs.length).fill(null),mode,label,poolSlug,round:1,retry:false,reviewOnly:false};
+  if(!qs.length){renderNoQuestions(label,poolSlug,style);return}
+  currentSession={questions:qs,index:0,answers:Array(qs.length).fill(null),mode,style,label,poolSlug,round:1,retry:false,reviewOnly:false};
   renderQuestion();
 }
-function renderNoQuestions(label,poolSlug){
-  app.innerHTML=`<section class="result-card complete-result"><div class="complete-icon">✓</div><div class="eyebrow">Section complete</div><h2>${esc(label)}</h2><p class="lede">Every question in this pool has been answered correctly at least once.</p><div class="result-actions"><button class="primary-btn" id="dashBtn">Dashboard</button></div></section>`;
+function renderNoQuestions(label,poolSlug,style){
+  const sm=poolSlug!=="mixed"?meta.sections.find(s=>s.slug===poolSlug):null;
+  const hasTrack=sm&&countForSection(sm,style)>0;
+  app.innerHTML=`<section class="result-card complete-result"><div class="complete-icon">${hasTrack?"✓":"—"}</div><div class="eyebrow">${esc(styleLabel(style))}</div><h2>${esc(label)}</h2><p class="lede">${hasTrack?"Every question in this track has been answered correctly at least once.":"There are no eligible questions for this track in this section."}</p><div class="result-actions">${hasTrack?'<button class="primary-btn" id="reviewBtn">Review completed</button><button class="secondary-btn" id="resetTrackBtn">Reset this track</button>':""}<button class="secondary-btn" id="dashBtn">Dashboard</button></div></section>`;
   document.getElementById("dashBtn").onclick=renderDashboard;
+  const review=document.getElementById("reviewBtn");
+  if(review)review.onclick=async()=>{
+    showLoading();const data=await getSection(poolSlug),all=questionsForData(data,style),qs=shuffle(all).slice(0,Math.min(50,all.length));
+    currentSession={questions:qs,index:0,answers:Array(qs.length).fill(null),mode:"exam",style,label:`${sm.label} · ${styleLabel(style)} review`,poolSlug,round:1,retry:false,reviewOnly:true};renderQuestion();
+  };
+  const reset=document.getElementById("resetTrackBtn");
+  if(reset)reset.onclick=async()=>{
+    if(!confirm(`Reset ${styleLabel(style)} completion for ${sm.label}?`))return;
+    showLoading();const data=await getSection(poolSlug),ids=new Set(questionsForData(data,style).map(q=>q.id)),p=loadProgress(),track=p[trackKey(style)]||{};
+    for(const id of ids)delete track[id];
+    p[trackKey(style)]=track;saveProgress(p);renderDashboard();
+  };
 }
+
+function feedbackHtml(s,q,chosen){
+  const correct=chosen===q.answerIndex;
+  if(s.style==="clinical"){
+    const explanation=q.explanation?esc(q.explanation):"";
+    return `<div class="feedback ${correct?"good":"bad"}"><strong>${correct?"Correct — cleared":"Incorrect"}</strong><p>${correct?"":`Correct answer: ${"ABCD"[q.answerIndex]}. ${esc(q.answer)} `}${explanation}</p></div>`;
+  }
+  return `<div class="feedback ${correct?"good":"bad"}"><strong>${correct?"Correct — cleared":"Incorrect"}</strong><p>${correct?"This question is now removed from normal future sessions.":`Correct answer: ${"ABCD"[q.answerIndex]}. ${esc(q.answer)} This question will return in the retry round.`}</p></div>`;
+}
+
 function renderQuestion(){
   const s=currentSession,q=s.questions[s.index],chosen=s.answers[s.index];
   const answered=chosen!==null;
   const reveal=s.mode==="study"&&answered;
   const guideOpen=s.guideOpenFor===q.id;
   const progress=pct(s.index+1,s.questions.length);
-  const modeLabel=s.retry?`Retry round ${s.round} · ${s.mode==="study"?"Study mode":"Exam mode"}`:(s.reviewOnly?"Completed review":(s.mode==="study"?"Study mode":"Exam mode"));
+  const modeName=s.mode==="study"?"Study · instant feedback":"Exam · grade at end";
+  const modeLabel=s.retry?`Retry round ${s.round} · ${styleLabel(s.style)}`:`${styleLabel(s.style)} · ${modeName}`;
   app.innerHTML=`
     <section class="quiz-head">
-      <div class="quiz-title"><div class="eyebrow">${esc(modeLabel)}</div><h2>${esc(s.label)}</h2><p>${s.questions.length} questions${s.retry?" · missed questions only":" · correct answers leave the active pool"}</p></div>
+      <div class="quiz-title"><div class="eyebrow">${esc(modeLabel)}</div><h2>${esc(s.label)}</h2><p>${s.questions.length} questions${s.retry?" · missed questions only":" · correct answers clear only this track"}</p></div>
       <div class="progress-wrap"><small>Question ${s.index+1} of ${s.questions.length}</small><div class="progress-bar"><span style="width:${progress}%"></span></div></div>
     </section>
-    <article class="question-card">
-      <div class="question-meta"><span class="badge">${esc(q.section.replace(/\s*\([^)]*\)\s*$/,"") )}</span><span class="badge">${esc(q.target)}</span><span class="badge">Source row ${q.sourceRow}</span></div>
+    <article class="question-card ${s.style==="clinical"?"clinical-question-card":""}">
+      <div class="question-meta"><span class="badge">${esc(q.section.replace(/\s*\([^)]*\)\s*$/,""))}</span><span class="badge">${esc(q.target)}</span>${s.style==="clinical"?'<span class="badge clinical-badge">Clinical case</span>':""}<span class="badge">Source row ${q.sourceRow}</span></div>
       <h3 class="question-text">${esc(q.question)}</h3>
       <div class="choices">${q.choices.map((choice,i)=>{
         let cls="choice";if(chosen===i)cls+=" selected";if(reveal&&i===q.answerIndex)cls+=" correct";if(reveal&&chosen===i&&chosen!==q.answerIndex)cls+=" wrong";
         return `<button class="${cls}" data-i="${i}" ${reveal?"disabled":""}><span class="choice-letter">${"ABCD"[i]}</span><span>${esc(choice)}</span></button>`
       }).join("")}</div>
-      ${reveal?`<div class="feedback ${chosen===q.answerIndex?"good":"bad"}"><strong>${chosen===q.answerIndex?"Correct — cleared":"Incorrect"}</strong><p>${chosen===q.answerIndex?"This question is now removed from normal future sessions.":`Correct answer: ${"ABCD"[q.answerIndex]}. ${esc(q.answer)} This question will return in the retry round.`}</p></div>`:""}
+      ${reveal?feedbackHtml(s,q,chosen):""}
       ${guideOpen?studyGuideHtml(q):""}
       <div class="quiz-actions">
         <div class="quiz-actions-left">
@@ -259,7 +312,7 @@ function chooseAnswer(i){
   if(s.mode==="study"&&s.answers[s.index]!==null)return;
   const first=s.answers[s.index]===null;
   s.answers[s.index]=i;
-  if(s.mode==="study"&&first)recordAttempt(q,i===q.answerIndex,{preserveCompletion:s.reviewOnly});
+  if(s.mode==="study"&&first)recordAttempt(q,i===q.answerIndex,{style:s.style,preserveCompletion:s.reviewOnly});
   renderQuestion();
 }
 function advance(){
@@ -268,15 +321,15 @@ function advance(){
 }
 function finishSession(){
   const s=currentSession;
-  if(s.mode==="exam")s.questions.forEach((q,i)=>recordAttempt(q,s.answers[i]===q.answerIndex,{preserveCompletion:s.reviewOnly}));
+  if(s.mode==="exam")s.questions.forEach((q,i)=>recordAttempt(q,s.answers[i]===q.answerIndex,{style:s.style,preserveCompletion:s.reviewOnly}));
   const correct=s.questions.reduce((n,q,i)=>n+(s.answers[i]===q.answerIndex?1:0),0);
   const missed=s.questions.filter((q,i)=>s.answers[i]!==q.answerIndex);
   const p=loadProgress();p.sessions=(p.sessions||0)+1;saveProgress(p);
   const allClear=missed.length===0;
   app.innerHTML=`
     <section class="result-card ${allClear?"complete-result":""}">
-      ${allClear?'<div class="complete-icon">✓</div>':""}<div class="eyebrow">${s.retry?(allClear?"Retry cleared":"Retry complete"):"Session complete"}</div><h2>${esc(s.label)}</h2>
-      <div class="result-score"><div class="score-ring">${pct(correct,s.questions.length)}%</div><div class="result-copy"><h3>${correct} / ${s.questions.length} correct</h3><p>${missed.length?`${missed.length} ${missed.length===1?"question remains":"questions remain"}. Correct questions are already cleared; retry only the ones you missed.`:(s.retry?"You cleared every question from this retry set.":"Every question in this session was cleared.")}</p></div></div>
+      ${allClear?'<div class="complete-icon">✓</div>':""}<div class="eyebrow">${esc(styleLabel(s.style))} · ${s.retry?(allClear?"Retry cleared":"Retry complete"):"Session complete"}</div><h2>${esc(s.label)}</h2>
+      <div class="result-score"><div class="score-ring">${pct(correct,s.questions.length)}%</div><div class="result-copy"><h3>${correct} / ${s.questions.length} correct</h3><p>${missed.length?`${missed.length} ${missed.length===1?"question remains":"questions remain"}. Correct questions are cleared from ${styleLabel(s.style)} only; retry the ones you missed.`:(s.retry?"You cleared every question from this retry set.":"Every question in this session was cleared.")}</p></div></div>
       <div class="result-actions">
         ${missed.length?`<button class="primary-btn" id="missedBtn">Retry missed (${missed.length})</button>`:""}
         <button class="secondary-btn" id="dashBtn">Dashboard</button>${!s.retry&&!s.reviewOnly?'<button class="secondary-btn" id="newBtn">New session</button>':""}
@@ -289,40 +342,39 @@ function finishSession(){
 }
 function startRetry(missed,previous){
   const qs=shuffle(missed);
-  currentSession={questions:qs,index:0,answers:Array(qs.length).fill(null),mode:previous.mode,label:previous.label,poolSlug:previous.poolSlug,round:(previous.round||1)+1,retry:true,reviewOnly:previous.reviewOnly};
+  currentSession={questions:qs,index:0,answers:Array(qs.length).fill(null),mode:previous.mode,style:previous.style,label:previous.label,poolSlug:previous.poolSlug,round:(previous.round||1)+1,retry:true,reviewOnly:previous.reviewOnly};
   renderQuestion();
 }
 
-async function renderCompletedSection(sectionMeta){
-  const sp=sectionProgress(sectionMeta);
-  app.innerHTML=`<section class="result-card complete-result"><div class="complete-icon">✓</div><div class="eyebrow">Section cleared</div><h2>${esc(sectionMeta.label)}</h2><p class="lede">${sp.completed.toLocaleString()} of ${sectionMeta.count.toLocaleString()} questions completed. These questions stay out of normal sessions unless you choose to review or reset this section.</p><div class="section-complete-bar"><span style="width:100%"></span></div><div class="result-actions"><button class="primary-btn" id="reviewBtn">Review completed</button><button class="secondary-btn" id="resetSectionBtn">Reset section</button><button class="secondary-btn" id="dashBtn">Dashboard</button></div></section>`;
-  document.getElementById("dashBtn").onclick=renderDashboard;
-  document.getElementById("reviewBtn").onclick=async()=>{
-    showLoading();const data=await getSection(sectionMeta.slug);const qs=shuffle(data.questions).slice(0,Math.min(50,data.questions.length));
-    currentSession={questions:qs,index:0,answers:Array(qs.length).fill(null),mode:"exam",label:`${sectionMeta.label} review`,poolSlug:sectionMeta.slug,round:1,retry:false,reviewOnly:true};renderQuestion();
-  };
-  document.getElementById("resetSectionBtn").onclick=async()=>{
-    if(!confirm(`Reset all completion progress for ${sectionMeta.label}? This will put every question in this section back into the active pool.`))return;
-    showLoading();const data=await getSection(sectionMeta.slug);const ids=new Set(data.questions.map(q=>q.id));const p=loadProgress();for(const id of ids)delete p.questions[id];saveProgress(p);renderDashboard();
-  };
+function trackStats(style,p){
+  const vals=Object.values(p[trackKey(style)]||{});
+  const attempts=vals.reduce((n,x)=>n+(x.attempts||0),0),correct=vals.reduce((n,x)=>n+(x.correct||0),0);
+  const gp=globalProgress(style,p);
+  return {...gp,attempts,correct,accuracy:pct(correct,attempts)};
+}
+function statsPanel(title,stats,kind){
+  return `<div class="mode-stats ${kind}">
+    <div class="mode-stats-head"><h3>${title}</h3><strong>${pctPrecise(stats.completed,stats.total)}%</strong></div>
+    <div class="progress-bar"><span style="width:${stats.total?(stats.completed/stats.total)*100:0}%"></span></div>
+    <div class="mode-stat-numbers"><span>${stats.completed.toLocaleString()} completed</span><span>${stats.remaining.toLocaleString()} remaining</span><span>${stats.accuracy}% accuracy</span></div>
+  </div>`;
 }
 function renderStats(){
-  const p=loadProgress(),overall=globalProgress(p),vals=Object.values(p.questions);
-  const attempts=vals.reduce((n,x)=>n+(x.attempts||0),0),correct=vals.reduce((n,x)=>n+(x.correct||0),0),misses=vals.reduce((n,x)=>n+(x.misses||0),0);
+  const p=loadProgress(),quick=trackStats("quick",p),clinical=trackStats("clinical",p);
   app.innerHTML=`<section class="stats-card"><div class="eyebrow">Local browser progress</div><h2>Your progress</h2>
-    <div class="stats-grid"><div class="stat-box"><strong>${overall.completed.toLocaleString()}</strong><span>completed</span></div><div class="stat-box"><strong>${overall.remaining.toLocaleString()}</strong><span>remaining</span></div><div class="stat-box"><strong>${pct(correct,attempts)}%</strong><span>answer accuracy</span></div><div class="stat-box"><strong>${p.sessions||0}</strong><span>sessions</span></div></div>
-    <div class="overall-progress"><div><strong>${pctPrecise(overall.completed,meta.total)}% complete</strong><span>${overall.completed.toLocaleString()} / ${meta.total.toLocaleString()} across all sections</span></div><div class="progress-bar"><span style="width:${(overall.completed/meta.total)*100}%"></span></div></div>
-    <p class="lede">A question is completed the first time you answer it correctly. Incorrect questions remain active and return in retry rounds until you clear them. Progress is stored in this browser with localStorage.</p>
+    <div class="progress-mode-stack">${statsPanel("Quick Burst",quick,"quick")}${statsPanel("Clinical Cases",clinical,"clinical")}</div>
+    <div class="stats-grid"><div class="stat-box"><strong>${p.sessions||0}</strong><span>sessions</span></div><div class="stat-box"><strong>${quick.attempts.toLocaleString()}</strong><span>quick attempts</span></div><div class="stat-box"><strong>${clinical.attempts.toLocaleString()}</strong><span>clinical attempts</span></div><div class="stat-box"><strong>${meta.clinicalTotal.toLocaleString()}</strong><span>clinical cases available</span></div></div>
+    <p class="lede">Quick Burst and Clinical Cases are independent mastery tracks. Clearing a clinical case never removes its related Quick Burst questions, and clearing a Quick Burst fact never removes a clinical case.</p>
     <div class="result-actions"><button class="primary-btn" id="backDash">Back to dashboard</button><button class="secondary-btn" id="clearProgress">Clear all progress</button></div></section>`;
   document.getElementById("backDash").onclick=renderDashboard;
-  document.getElementById("clearProgress").onclick=()=>{if(confirm("Clear all saved NAVLE progress in this browser? Every question will become active again.")){localStorage.removeItem(APP_KEY);renderStats()}};
+  document.getElementById("clearProgress").onclick=()=>{if(confirm("Clear all saved NAVLE progress in this browser? Both Quick Burst and Clinical Cases will reset.")){localStorage.removeItem(APP_KEY);renderStats()}};
 }
 
 document.getElementById("homeBtn").onclick=renderDashboard;
 document.getElementById("statsBtn").onclick=renderStats;
 document.getElementById("resetBtn").onclick=()=>{
   if(!currentSession){renderDashboard();return}
-  if(confirm("Restart this session from question 1? Answers from this current session will be cleared, but questions already completed in earlier sessions stay completed.")){
+  if(confirm("Restart this session from question 1? Answers from this current session will be cleared, but earlier completed questions stay completed.")){
     currentSession.index=0;currentSession.answers=Array(currentSession.questions.length).fill(null);renderQuestion();
   }
 };
