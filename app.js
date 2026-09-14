@@ -4,6 +4,24 @@ const loadingTemplate = document.getElementById("loadingTemplate");
 let meta = null;
 let currentSession = null;
 const cache = new Map();
+const CLINICAL_COUNTS_FALLBACK = {
+  "canine":103,"feline":86,"equine":149,"bovine":134,"porcine":63,
+  "small-mammal":52,"ovinecaprine":36,"bird":23,"poultry":60,
+  "camelidcervid":28,"reptile":3,"aquatics":21,"other":0
+};
+function hydrateClinicalMeta(){
+  if(!meta?.sections)return;
+  meta.sections.forEach(s=>{
+    const fallback=CLINICAL_COUNTS_FALLBACK[s.slug]||0;
+    if(!Number.isFinite(Number(s.clinicalCount)) || Number(s.clinicalCount)<=0){
+      s.clinicalCount=fallback;
+    }
+  });
+  const fallbackTotal=meta.sections.reduce((n,s)=>n+(CLINICAL_COUNTS_FALLBACK[s.slug]||0),0);
+  if(!Number.isFinite(Number(meta.clinicalTotal)) || Number(meta.clinicalTotal)<=0){
+    meta.clinicalTotal=fallbackTotal;
+  }
+}
 
 function esc(v=""){return String(v).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
 function pct(n,d){return d ? Math.round((n/d)*100) : 0}
@@ -85,13 +103,14 @@ function globalProgress(style,progress=loadProgress()){
 function showLoading(){app.innerHTML="";app.appendChild(loadingTemplate.content.cloneNode(true))}
 async function init(){
   showLoading();
-  meta=await fetch("data/index.json?v=12").then(r=>r.json());
+  meta=await fetch("data/index.json?v=14").then(r=>r.json());
+  hydrateClinicalMeta();
   normalizeProgress(loadProgress());
   renderDashboard();
 }
 async function getSection(slug){
   if(cache.has(slug))return cache.get(slug);
-  const data=await fetch(`data/${slug}.json?v=12`).then(r=>r.json());
+  const data=await fetch(`data/${slug}.json?v=14`).then(r=>r.json());
   cache.set(slug,data);return data;
 }
 function questionsForData(data,style){return style==="clinical"?(data.clinicalQuestions||[]):data.questions}
@@ -153,7 +172,7 @@ function renderDashboard(){
       <div>
         <div class="eyebrow">Rigorous NAVLE review</div>
         <h1>good luck &lt;3</h1>
-        <p class="lede">Use Quick Burst to build factual recall, then Clinical Cases to apply those facts to patient-style vignettes. The two tracks have separate completion progress so one never clears the other.</p>
+        <p class="lede">Build recall with Quick Burst, then apply it with Clinical Cases. Progress is tracked separately.</p>
       </div>
       <aside class="hero-stat dual-progress">
         ${progressLane("Quick Burst",quick,"quick")}
@@ -170,7 +189,7 @@ function renderDashboard(){
       </div>
       <div class="field"><label>Feedback</label><select id="modeSelect"><option value="study">Study · instant feedback</option><option value="exam">Exam · grade at end</option></select></div>
       <div class="field"><label>Questions</label><select id="sizeSelect"><option>20</option><option selected>50</option><option>100</option><option>200</option></select></div>
-      <button class="primary-btn" id="startBtn">Start session</button>
+      <div class="start-session-row"><button class="primary-btn" id="startBtn">Start session</button></div>
     </section>
 
     <div class="section-heading"><div><div class="eyebrow">Question bank</div><h2>Study by section</h2></div><p>${meta.sections.length} sections</p></div>
@@ -178,11 +197,21 @@ function renderDashboard(){
       ${meta.sections.map(s=>{
         const qp=sectionProgress(s,"quick",progress), cp=sectionProgress(s,"clinical",progress);
         return `<button class="category-card dual-card" data-slug="${s.slug}">
-          <div class="card-top"><span class="count">${s.count.toLocaleString()} quick · ${(s.clinicalCount||0).toLocaleString()} cases</span></div>
+          <div class="card-top section-counts">
+            <span>${s.count.toLocaleString()} Quick Burst</span>
+            <span>${(s.clinicalCount||0).toLocaleString()} Clinical Cases</span>
+          </div>
           <h3>${esc(s.label)}</h3>
-          <div class="track-block"><div class="track-label"><span>Quick Burst</span><span>${qp.remaining.toLocaleString()} left</span></div><div class="mini-progress"><span style="width:${qp.count?(qp.completed/qp.count)*100:0}%"></span></div></div>
-          <div class="track-block clinical-track"><div class="track-label"><span>Clinical Cases</span><span>${cp.count?`${cp.remaining.toLocaleString()} left`:"No cases"}</span></div><div class="mini-progress"><span style="width:${cp.count?(cp.completed/cp.count)*100:0}%"></span></div></div>
-          <div class="card-footer"><span>${qp.completed.toLocaleString()} quick cleared</span><span>${cp.completed.toLocaleString()} cases cleared</span></div>
+          <div class="track-block quick-track">
+            <div class="track-label"><span class="track-name">Quick Burst</span><span class="track-remaining">${qp.remaining.toLocaleString()} remaining</span></div>
+            <div class="mini-progress"><span style="width:${qp.count?(qp.completed/qp.count)*100:0}%"></span></div>
+            <div class="track-cleared">${qp.completed.toLocaleString()} cleared</div>
+          </div>
+          <div class="track-block clinical-track">
+            <div class="track-label"><span class="track-name">Clinical Cases</span><span class="track-remaining">${cp.count?`${cp.remaining.toLocaleString()} remaining`:"No cases"}</span></div>
+            <div class="mini-progress"><span style="width:${cp.count?(cp.completed/cp.count)*100:0}%"></span></div>
+            <div class="track-cleared">${cp.completed.toLocaleString()} cleared</div>
+          </div>
         </button>`
       }).join("")}
     </section>`;
