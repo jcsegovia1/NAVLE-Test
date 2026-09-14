@@ -9,7 +9,7 @@
       "weight": 25.6,
       "idMin": 1571,
       "idMax": 2502,
-      "clinicalCount": 103
+      "clinicalCount": 102
     },
     {
       "section": "Feline (24.3)",
@@ -19,7 +19,7 @@
       "weight": 24.3,
       "idMin": 3402,
       "idMax": 4046,
-      "clinicalCount": 86
+      "clinicalCount": 85
     },
     {
       "section": "Equine (14.7)",
@@ -29,7 +29,7 @@
       "weight": 14.7,
       "idMin": 2503,
       "idMax": 3401,
-      "clinicalCount": 149
+      "clinicalCount": 144
     },
     {
       "section": "Bovine (13.3)",
@@ -39,7 +39,7 @@
       "weight": 13.3,
       "idMin": 370,
       "idMax": 1310,
-      "clinicalCount": 134
+      "clinicalCount": 123
     },
     {
       "section": "Porcine (5)",
@@ -59,7 +59,7 @@
       "weight": 3.3,
       "idMin": 4047,
       "idMax": 4323,
-      "clinicalCount": 52
+      "clinicalCount": 47
     },
     {
       "section": "OvineCaprine (3.3)",
@@ -69,7 +69,7 @@
       "weight": 3.3,
       "idMin": 4324,
       "idMax": 4596,
-      "clinicalCount": 36
+      "clinicalCount": 35
     },
     {
       "section": "Bird (2.3)",
@@ -119,7 +119,7 @@
       "weight": 1.0,
       "idMin": 1,
       "idMax": 175,
-      "clinicalCount": 21
+      "clinicalCount": 20
     },
     {
       "section": "Other",
@@ -132,5 +132,5 @@
       "clinicalCount": 0
     }
   ],
-  "clinicalTotal": 758
+  "clinicalTotal": 733
 }
