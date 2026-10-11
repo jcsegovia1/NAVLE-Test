@@ -33,3 +33,10 @@
 .podcast-status:empty{display:none}
 .podcast-status{color:#c6dcd1;margin:0 0 16px}
 @media(max-width:650px){.podcast-library-heading{align-items:stretch;flex-direction:column}.podcast-filter-label select{width:100%}.podcast-card{padding:20px}.podcast-hero{margin-top:10px}.podcast-main{padding-bottom:40px}.topbar-actions .podcast-nav-link{padding:9px 11px;font-size:13px}}
+
+/* Audio-only resume state; existing quiz styling is unchanged. */
+.podcast-resume-note{font-size:12px;color:#acd6c3;flex-basis:100%}
+.podcast-resume-note:empty{display:none}
+.podcast-restart{font:inherit;font-size:12px;color:#e9f7ef;background:#19352b;border:1px solid #456a59;border-radius:9px;padding:8px 11px;cursor:pointer}
+.podcast-restart:hover,.podcast-restart:focus-visible{background:#245141}
+.podcast-restart[hidden]{display:none}

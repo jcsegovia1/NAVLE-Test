@@ -4,6 +4,65 @@ const statusNode = document.getElementById('podcastStatus');
 const episodeNode = document.getElementById('podcastEpisodes');
 const subjectNode = document.getElementById('podcastSubject');
 let episodes = [];
+
+// Podcast playback positions use a separate keyspace from the quiz progress data.
+const positionPrefix='navle-podcast-position-v1:';
+const positionKey=e=>positionPrefix+String(e.id||e.audioUrl);
+function storedPosition(e){
+  try{const n=Number(localStorage.getItem(positionKey(e)));return Number.isFinite(n)&&n>0?n:0}
+  catch(_){return 0}
+}
+function savePosition(e,audio){
+  if(!Number.isFinite(audio.currentTime)||audio.currentTime<0)return;
+  try{
+    if(audio.ended || (Number.isFinite(audio.duration)&&audio.duration>0&&audio.currentTime>=audio.duration-3)){
+      localStorage.removeItem(positionKey(e));
+    }else if(audio.currentTime>=1){
+      localStorage.setItem(positionKey(e),String(Math.floor(audio.currentTime)));
+    }
+  }catch(_){/* Private browsing or disabled storage: playback still works. */}
+}
+function clearPosition(e){try{localStorage.removeItem(positionKey(e))}catch(_){}}
+function timeLabel(seconds){
+  const n=Math.max(0,Math.floor(seconds));
+  return Math.floor(n/3600)?`${Math.floor(n/3600)}:${String(Math.floor(n%3600/60)).padStart(2,'0')}:${String(n%60).padStart(2,'0')}`
+    :`${Math.floor(n/60)}:${String(n%60).padStart(2,'0')}`;
+}
+function enableResume(e,audio,controls){
+  const note=document.createElement('span');note.className='podcast-resume-note';note.setAttribute('role','status');
+  note.setAttribute('aria-live','polite');
+  const restart=document.createElement('button');restart.type='button';restart.className='podcast-restart';restart.textContent='Start over';
+  controls.append(note,restart);
+  const saved=storedPosition(e);
+  if(saved>=5)note.textContent=`Saved position: ${timeLabel(saved)}`;
+  else restart.hidden=true;
+  let restored=false;
+  audio.addEventListener('loadedmetadata',()=>{
+    if(restored)return;
+    restored=true;
+    const resume=storedPosition(e);
+    if(resume>=5 && ( !Number.isFinite(audio.duration) || resume<audio.duration-5)){
+      try{audio.currentTime=resume;note.textContent=`Resumed at ${timeLabel(resume)}`;restart.hidden=false}
+      catch(_){note.textContent=`Saved position: ${timeLabel(resume)}`}
+    }else if(resume>0){clearPosition(e);note.textContent='';restart.hidden=true}
+  });
+  // Safari can defer metadata until play is pressed. Setting the seek on loadedmetadata
+  // resumes without triggering playback or interfering with lock-screen audio controls.
+  let lastStoredSecond=-1;
+  audio.addEventListener('timeupdate',()=>{
+    const sec=Math.floor(audio.currentTime);
+    if(sec-lastStoredSecond>=5 || sec<lastStoredSecond){savePosition(e,audio);lastStoredSecond=sec}
+  });
+  audio.addEventListener('pause',()=>savePosition(e,audio));
+  audio.addEventListener('seeking',()=>savePosition(e,audio));
+  audio.addEventListener('ended',()=>{clearPosition(e);note.textContent='Finished';restart.hidden=true});
+  restart.addEventListener('click',()=>{
+    clearPosition(e);audio.currentTime=0;note.textContent='Started over';restart.hidden=true;
+  });
+  // pagehide also runs when Safari is backgrounded, including on iPhone.
+  window.addEventListener('pagehide',()=>savePosition(e,audio));
+}
+
 const escapeText = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function renderEpisodes(){
   const selected=subjectNode.value;
@@ -24,7 +83,7 @@ function renderEpisodes(){
       const speed=document.createElement('select');speed.setAttribute('aria-label',`Playback speed for ${e.title}`);
       for(const v of [1,1.25,1.5,2]){const opt=document.createElement('option');opt.value=String(v);opt.textContent=v+'×';speed.appendChild(opt)}
       speed.addEventListener('change',()=>{audio.playbackRate=Number(speed.value)});
-      label.appendChild(speed);controls.appendChild(label);card.appendChild(controls);
+      label.appendChild(speed);controls.appendChild(label);enableResume(e,audio,controls);card.appendChild(controls);
       audio.addEventListener('error',()=>{statusNode.textContent='One audio file could not be loaded. Check its MP3 path and capitalization.'});
     }else{
       const message=document.createElement('p');message.className='podcast-empty';message.textContent='The episode is ready in the library. Upload the finished MP3 and mark it published to enable listening and downloads.';card.appendChild(message);
