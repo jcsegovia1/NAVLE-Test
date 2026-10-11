@@ -10,7 +10,7 @@
       "description": "Bella and Edward review important small-animal toxicology concepts through veterinary clinical reasoning, diagnostic clues, treatments, and active recall. Episode 1 is planned to run about 20 minutes.",
       "hosts": "Bella (educator) & Edward (student)",
       "durationLabel": "~20 min planned",
-      "published": false,
+      "published": true,
       "audioUrl": "audio/NAVLE_Episode_01.mp3",
       "relatedQuiz": {
         "label": "Practice canine & feline questions",
