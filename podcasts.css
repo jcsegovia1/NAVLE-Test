@@ -1,5 +1,8 @@
 /* Podcast add-on. Does not override existing quiz layouts or progress tracking. */
 .podcast-nav-link{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;white-space:nowrap}
+/* Match the white navigation text used by the existing buttons, not the browser link blue. */
+.topbar-actions a.podcast-nav-link,.topbar-actions a.podcast-nav-link:link,.topbar-actions a.podcast-nav-link:visited{color:#f1f9f5}
+.topbar-actions a.podcast-nav-link:hover,.topbar-actions a.podcast-nav-link:focus-visible{color:#ffffff}
 .podcasts-brand{text-decoration:none;color:inherit}
 .podcast-main{padding-bottom:60px}
 .podcast-hero{margin:24px 0 34px;padding:34px clamp(20px,5vw,48px);border:1px solid var(--line,#29443d);border-radius:24px;background:linear-gradient(145deg,#15332a,#10211e 68%,#0b1715);color:var(--text,#f1f9f5)}
