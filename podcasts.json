@@ -1,19 +1,379 @@
 {
-  "version": 1,
+  "series": "NAVLE Bible Audio Review",
+  "version": 6,
   "episodes": [
     {
-      "id": "bella-edward-001",
       "episode": 1,
-      "title": "Bella & Edward — Small Animal Toxicology",
-      "subject": "Toxicology",
-      "topic": "Small Animal Toxicology",
-      "description": "Bella and Edward review important small-animal toxicology concepts through veterinary clinical reasoning, diagnostic clues, treatments, and active recall. Episode 1 is planned to run about 20 minutes.",
-      "hosts": "Bella (educator) & Edward (student)",
-      "durationLabel": "~20 min planned",
-      "published": true,
+      "title": "Toxicology",
+      "filename": "NAVLE_Episode_01.mp3",
       "audioUrl": "audio/NAVLE_Episode_01.mp3",
+      "description": "NAVLE Bible audio review with clinical reasoning and active recall.",
+      "durationSeconds": null,
+      "id": "navle-bible-01",
+      "subject": "Toxicology",
+      "hosts": "Alex & Maya",
       "relatedQuiz": {
-        "label": "Practice canine & feline questions",
+        "label": "Practice questions",
+        "url": "index.html"
+      }
+    },
+    {
+      "episode": 2,
+      "title": "Clinical Pathology, Hematology & Hypersensitivities",
+      "filename": "NAVLE_Episode_02.mp3",
+      "audioUrl": "audio/NAVLE_Episode_02.mp3",
+      "description": "NAVLE Bible audio review with clinical reasoning and active recall.",
+      "durationSeconds": null,
+      "id": "navle-bible-02",
+      "subject": "Clinical Pathology",
+      "hosts": "Alex & Maya",
+      "relatedQuiz": {
+        "label": "Practice questions",
+        "url": "index.html"
+      }
+    },
+    {
+      "episode": 3,
+      "title": "Cardiology, Rhythm Problems, and Oxygenation",
+      "filename": "NAVLE_Episode_03.mp3",
+      "audioUrl": "audio/NAVLE_Episode_03.mp3",
+      "description": "NAVLE Bible audio review with clinical reasoning and active recall.",
+      "durationSeconds": null,
+      "id": "navle-bible-03",
+      "subject": "Cardiology",
+      "hosts": "Alex & Maya",
+      "relatedQuiz": {
+        "label": "Practice questions",
+        "url": "index.html"
+      }
+    },
+    {
+      "episode": 4,
+      "title": "Respiratory Emergencies, Neuro Localization, and Liver Clues",
+      "filename": "NAVLE_Episode_04.mp3",
+      "audioUrl": "audio/NAVLE_Episode_04.mp3",
+      "description": "NAVLE Bible audio review with clinical reasoning and active recall.",
+      "durationSeconds": null,
+      "id": "navle-bible-04",
+      "subject": "Respiratory Emergencies",
+      "hosts": "Alex & Maya",
+      "relatedQuiz": {
+        "label": "Practice questions",
+        "url": "index.html"
+      }
+    },
+    {
+      "episode": 5,
+      "title": "Fungi, Small-Animal Parasites, and Heartworm",
+      "filename": "NAVLE_Episode_05.mp3",
+      "audioUrl": "audio/NAVLE_Episode_05.mp3",
+      "description": "NAVLE Bible audio review with clinical reasoning and active recall.",
+      "durationSeconds": null,
+      "id": "navle-bible-05",
+      "subject": "Fungi",
+      "hosts": "Alex & Maya",
+      "relatedQuiz": {
+        "label": "Practice questions",
+        "url": "index.html"
+      }
+    },
+    {
+      "episode": 6,
+      "title": "Large-Animal Parasites, Ectoparasites, and Oncology Basics",
+      "filename": "NAVLE_Episode_06.mp3",
+      "audioUrl": "audio/NAVLE_Episode_06.mp3",
+      "description": "NAVLE Bible audio review with clinical reasoning and active recall.",
+      "durationSeconds": null,
+      "id": "navle-bible-06",
+      "subject": "Large-Animal Parasites",
+      "hosts": "Alex & Maya",
+      "relatedQuiz": {
+        "label": "Practice questions",
+        "url": "index.html"
+      }
+    },
+    {
+      "episode": 7,
+      "title": "Tumors, Renal Disorders, Urinary Physiology, and Clostridia",
+      "filename": "NAVLE_Episode_07.mp3",
+      "audioUrl": "audio/NAVLE_Episode_07.mp3",
+      "description": "NAVLE Bible audio review with clinical reasoning and active recall.",
+      "durationSeconds": null,
+      "id": "navle-bible-07",
+      "subject": "Tumors",
+      "hosts": "Alex & Maya",
+      "relatedQuiz": {
+        "label": "Practice questions",
+        "url": "index.html"
+      }
+    },
+    {
+      "episode": 8,
+      "title": "Clostridial and Vector-Borne Disease, Plus Reproductive Review",
+      "filename": "NAVLE_Episode_08.mp3",
+      "audioUrl": "audio/NAVLE_Episode_08.mp3",
+      "description": "NAVLE Bible audio review with clinical reasoning and active recall.",
+      "durationSeconds": null,
+      "id": "navle-bible-08",
+      "subject": "Clostridial and Vector-Borne Disease",
+      "hosts": "Alex & Maya",
+      "relatedQuiz": {
+        "label": "Practice questions",
+        "url": "index.html"
+      }
+    },
+    {
+      "episode": 9,
+      "title": "Fractures, Ophthalmology, and Drug Safety",
+      "filename": "NAVLE_Episode_09.mp3",
+      "audioUrl": "audio/NAVLE_Episode_09.mp3",
+      "description": "NAVLE Bible audio review with clinical reasoning and active recall.",
+      "durationSeconds": null,
+      "id": "navle-bible-09",
+      "subject": "Fractures",
+      "hosts": "Alex & Maya",
+      "relatedQuiz": {
+        "label": "Practice questions",
+        "url": "index.html"
+      }
+    },
+    {
+      "episode": 10,
+      "title": "Zoonoses, Vaccines, Fish, Primates, and Rabbits",
+      "filename": "NAVLE_Episode_10.mp3",
+      "audioUrl": "audio/NAVLE_Episode_10.mp3",
+      "description": "NAVLE Bible audio review with clinical reasoning and active recall.",
+      "durationSeconds": null,
+      "id": "navle-bible-10",
+      "subject": "Zoonoses",
+      "hosts": "Alex & Maya",
+      "relatedQuiz": {
+        "label": "Practice questions",
+        "url": "index.html"
+      }
+    },
+    {
+      "episode": 11,
+      "title": "Rodents, Reptiles, and Avian Medicine",
+      "filename": "NAVLE_Episode_11.mp3",
+      "audioUrl": "audio/NAVLE_Episode_11.mp3",
+      "description": "NAVLE Bible audio review with clinical reasoning and active recall.",
+      "durationSeconds": null,
+      "id": "navle-bible-11",
+      "subject": "Rodents",
+      "hosts": "Alex & Maya",
+      "relatedQuiz": {
+        "label": "Practice questions",
+        "url": "index.html"
+      }
+    },
+    {
+      "episode": 12,
+      "title": "Pet Birds and Poultry: Infectious Diseases",
+      "filename": "NAVLE_Episode_12.mp3",
+      "audioUrl": "audio/NAVLE_Episode_12.mp3",
+      "description": "NAVLE Bible audio review with clinical reasoning and active recall.",
+      "durationSeconds": null,
+      "id": "navle-bible-12",
+      "subject": "Pet Birds and Poultry",
+      "hosts": "Alex & Maya",
+      "relatedQuiz": {
+        "label": "Practice questions",
+        "url": "index.html"
+      }
+    },
+    {
+      "episode": 13,
+      "title": "Poultry Disease and the Start of Swine Medicine",
+      "filename": "NAVLE_Episode_13.mp3",
+      "audioUrl": "audio/NAVLE_Episode_13.mp3",
+      "description": "NAVLE Bible audio review with clinical reasoning and active recall.",
+      "durationSeconds": null,
+      "id": "navle-bible-13",
+      "subject": "Poultry Disease and the Start of Swine Medicine",
+      "hosts": "Alex & Maya",
+      "relatedQuiz": {
+        "label": "Practice questions",
+        "url": "index.html"
+      }
+    },
+    {
+      "episode": 14,
+      "title": "Swine Gastrointestinal, Respiratory, and Systemic Disease",
+      "filename": "NAVLE_Episode_14.mp3",
+      "audioUrl": "audio/NAVLE_Episode_14.mp3",
+      "description": "NAVLE Bible audio review with clinical reasoning and active recall.",
+      "durationSeconds": null,
+      "id": "navle-bible-14",
+      "subject": "Swine Gastrointestinal",
+      "hosts": "Alex & Maya",
+      "relatedQuiz": {
+        "label": "Practice questions",
+        "url": "index.html"
+      }
+    },
+    {
+      "episode": 15,
+      "title": "Sheep, Goats, and Early Ruminant Medicine",
+      "filename": "NAVLE_Episode_15.mp3",
+      "audioUrl": "audio/NAVLE_Episode_15.mp3",
+      "description": "NAVLE Bible audio review with clinical reasoning and active recall.",
+      "durationSeconds": null,
+      "id": "navle-bible-15",
+      "subject": "Sheep",
+      "hosts": "Alex & Maya",
+      "relatedQuiz": {
+        "label": "Practice questions",
+        "url": "index.html"
+      }
+    },
+    {
+      "episode": 16,
+      "title": "Cattle: Infection, Minerals, and Production Problems",
+      "filename": "NAVLE_Episode_16.mp3",
+      "audioUrl": "audio/NAVLE_Episode_16.mp3",
+      "description": "NAVLE Bible audio review with clinical reasoning and active recall.",
+      "durationSeconds": null,
+      "id": "navle-bible-16",
+      "subject": "Cattle",
+      "hosts": "Alex & Maya",
+      "relatedQuiz": {
+        "label": "Practice questions",
+        "url": "index.html"
+      }
+    },
+    {
+      "episode": 17,
+      "title": "Cattle: Lameness, Mastitis, Reproduction, and Herd Problems",
+      "filename": "NAVLE_Episode_17.mp3",
+      "audioUrl": "audio/NAVLE_Episode_17.mp3",
+      "description": "NAVLE Bible audio review with clinical reasoning and active recall.",
+      "durationSeconds": null,
+      "id": "navle-bible-17",
+      "subject": "Cattle",
+      "hosts": "Alex & Maya",
+      "relatedQuiz": {
+        "label": "Practice questions",
+        "url": "index.html"
+      }
+    },
+    {
+      "episode": 18,
+      "title": "Feline Gastrointestinal, Urinary, Respiratory, and Neoplastic Disease",
+      "filename": "NAVLE_Episode_18.mp3",
+      "audioUrl": "audio/NAVLE_Episode_18.mp3",
+      "description": "NAVLE Bible audio review with clinical reasoning and active recall.",
+      "durationSeconds": null,
+      "id": "navle-bible-18",
+      "subject": "Feline Gastrointestinal",
+      "hosts": "Alex & Maya",
+      "relatedQuiz": {
+        "label": "Practice questions",
+        "url": "index.html"
+      }
+    },
+    {
+      "episode": 19,
+      "title": "Dogs: Infectious, Eye, Skin, Respiratory, and GI Disease",
+      "filename": "NAVLE_Episode_19.mp3",
+      "audioUrl": "audio/NAVLE_Episode_19.mp3",
+      "description": "NAVLE Bible audio review with clinical reasoning and active recall.",
+      "durationSeconds": null,
+      "id": "navle-bible-19",
+      "subject": "Dogs",
+      "hosts": "Alex & Maya",
+      "relatedQuiz": {
+        "label": "Practice questions",
+        "url": "index.html"
+      }
+    },
+    {
+      "episode": 20,
+      "title": "Dogs: Orthopedics, Neurology, Cancer, and Renal Clues",
+      "filename": "NAVLE_Episode_20.mp3",
+      "audioUrl": "audio/NAVLE_Episode_20.mp3",
+      "description": "NAVLE Bible audio review with clinical reasoning and active recall.",
+      "durationSeconds": null,
+      "id": "navle-bible-20",
+      "subject": "Dogs",
+      "hosts": "Alex & Maya",
+      "relatedQuiz": {
+        "label": "Practice questions",
+        "url": "index.html"
+      }
+    },
+    {
+      "episode": 21,
+      "title": "Endocrine and Cardiac Diseases of Dogs and Cats",
+      "filename": "NAVLE_Episode_21.mp3",
+      "audioUrl": "audio/NAVLE_Episode_21.mp3",
+      "description": "NAVLE Bible audio review with clinical reasoning and active recall.",
+      "durationSeconds": null,
+      "id": "navle-bible-21",
+      "subject": "Endocrine and Cardiac Diseases of Dogs and Cats",
+      "hosts": "Alex & Maya",
+      "relatedQuiz": {
+        "label": "Practice questions",
+        "url": "index.html"
+      }
+    },
+    {
+      "episode": 22,
+      "title": "Canine GI Emergencies and Core Equine Infectious Disease",
+      "filename": "NAVLE_Episode_22.mp3",
+      "audioUrl": "audio/NAVLE_Episode_22.mp3",
+      "description": "NAVLE Bible audio review with clinical reasoning and active recall.",
+      "durationSeconds": null,
+      "id": "navle-bible-22",
+      "subject": "Canine GI Emergencies and Core Equine Infectious Disease",
+      "hosts": "Alex & Maya",
+      "relatedQuiz": {
+        "label": "Practice questions",
+        "url": "index.html"
+      }
+    },
+    {
+      "episode": 23,
+      "title": "Equine Neonates, Clinical Pathology, Eye Disease, and Lameness",
+      "filename": "NAVLE_Episode_23.mp3",
+      "audioUrl": "audio/NAVLE_Episode_23.mp3",
+      "description": "NAVLE Bible audio review with clinical reasoning and active recall.",
+      "durationSeconds": null,
+      "id": "navle-bible-23",
+      "subject": "Equine Neonates",
+      "hosts": "Alex & Maya",
+      "relatedQuiz": {
+        "label": "Practice questions",
+        "url": "index.html"
+      }
+    },
+    {
+      "episode": 24,
+      "title": "Equine Muscle, Neurologic, and Colic Differentials",
+      "filename": "NAVLE_Episode_24.mp3",
+      "audioUrl": "audio/NAVLE_Episode_24.mp3",
+      "description": "NAVLE Bible audio review with clinical reasoning and active recall.",
+      "durationSeconds": null,
+      "id": "navle-bible-24",
+      "subject": "Equine Muscle",
+      "hosts": "Alex & Maya",
+      "relatedQuiz": {
+        "label": "Practice questions",
+        "url": "index.html"
+      }
+    },
+    {
+      "episode": 25,
+      "title": "Equine Respiratory, Reproduction, and Diagnostic Test Review",
+      "filename": "NAVLE_Episode_25.mp3",
+      "audioUrl": "audio/NAVLE_Episode_25.mp3",
+      "description": "NAVLE Bible audio review with clinical reasoning and active recall.",
+      "durationSeconds": null,
+      "id": "navle-bible-25",
+      "subject": "Equine Respiratory",
+      "hosts": "Alex & Maya",
+      "relatedQuiz": {
+        "label": "Practice questions",
         "url": "index.html"
       }
     }
